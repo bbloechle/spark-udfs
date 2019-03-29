@@ -75,6 +75,18 @@ df7 = df6.withColumn("z", expit_pandas_udf("y"))
 
 # ## Scala UDFs
 
+!cat spark-defaults.conf
+
+spark.udf.registerJavaFunction("logit_scala_udf", "com.cloudera.education.spark.udfs.Logit", DoubleType())
+spark.udf.registerJavaFunction("expit_scala_udf", "com.cloudera.education.spark.udfs.Expit", DoubleType())
+
+df1.createOrReplaceTempView("df1_view")
+df8 = spark.sql("select *, expit_scala_udf(y) as z from (select x, logit_scala_udf(x) as y from df1_view) tmp")
+
+%time df8.select(sum("x"), sum("z")).show()
+
+# **Question:** Can we use these in the DataFrame API?
+
 
 # ## Cleanup
                      
